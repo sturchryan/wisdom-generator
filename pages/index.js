@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Heart, Sparkles, User, MapPin, Fish, Shell, Brain, Lightbulb } from 'lucide-react';
 
 const WisdomGenerator = () => {
@@ -41,16 +41,22 @@ const WisdomGenerator = () => {
         {icons.map((item, index) => (
           <div
             key={index}
-            className="absolute animate-float opacity-20"
+            className="absolute opacity-20"
             style={{
               left: `${10 + (index * 15)}%`,
-              animationDelay: `${item.delay}s`,
-              animationDuration: `${item.duration}s`
+              animation: `float ${item.duration}s ease-in-out infinite ${item.delay}s`
             }}
           >
             <item.Icon className="w-8 h-8 text-teal-400" />
           </div>
         ))}
+        <style jsx>{`
+          @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(5deg); }
+            66% { transform: translateY(-10px) rotate(-5deg); }
+          }
+        `}</style>
       </div>
     );
   };
@@ -64,14 +70,19 @@ const WisdomGenerator = () => {
         {[...Array(50)].map((_, i) => (
           <div
             key={i}
-            className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-teal-400 rounded animate-confetti"
+            className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-teal-400 rounded"
             style={{
               left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${2 + Math.random() * 3}s`
+              animation: `confetti ${2 + Math.random() * 3}s linear forwards ${Math.random() * 3}s`
             }}
           />
         ))}
+        <style jsx>{`
+          @keyframes confetti {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+          }
+        `}</style>
       </div>
     );
   };
@@ -114,7 +125,7 @@ const WisdomGenerator = () => {
     return `in your ${decade}s`;
   };
 
-  const handleAgeSubmit = async () => {
+  const handleAgeSubmit = () => {
     const calculatedDecades = calculateDecades(responses.age);
     setDecades(calculatedDecades);
     if (calculatedDecades.length > 0) {
@@ -223,10 +234,10 @@ const WisdomGenerator = () => {
         EMAILJS_CONFIG.PUBLIC_KEY
       );
 
-      console.log('✅ Email notification sent successfully!');
+      console.log('Email sent successfully!');
       return true;
     } catch (error) {
-      console.error('❌ Email notification failed:', error);
+      console.error('Email failed:', error);
       return false;
     }
   };
@@ -246,7 +257,6 @@ const WisdomGenerator = () => {
     setAllSessions(prev => [...prev, completedSession]);
     setIsSubmitting(false);
     
-    // Trigger confetti
     setShowConfetti(true);
     setTimeout(() => setShowConfetti(false), 5000);
     
@@ -255,21 +265,20 @@ const WisdomGenerator = () => {
 
   const getAIEncouragement = async (userResponse) => {
     try {
-      const prompt = `The user just shared this wisdom: "${userResponse}"
+      if (typeof window !== 'undefined' && window.claude && window.claude.complete) {
+        const prompt = `The user just shared this wisdom: "${userResponse}"
 
-Respond with a brief, warm, encouraging message (1-2 sentences max) that acknowledges their insight. Be genuine and specific to what they shared. Examples of good responses:
-- "That's such valuable wisdom about relationships"
-- "What a powerful lesson about resilience" 
-- "Thank you for sharing that insight about growth"
+Respond with a brief, warm, encouraging message (1-2 sentences max) that acknowledges their insight. Be genuine and specific to what they shared.
 
 Your response:`;
 
-      const aiResponse = await window.claude.complete(prompt);
-      return aiResponse.trim();
+        const aiResponse = await window.claude.complete(prompt);
+        return aiResponse.trim();
+      }
     } catch (error) {
       console.error('Error getting AI encouragement:', error);
-      return getRandomEncouragement();
     }
+    return getRandomEncouragement();
   };
 
   const resetSurvey = () => {
@@ -455,7 +464,7 @@ Your response:`;
               </button>
               <button
                 onClick={handleSkip}
-                className="px-6 py-4 text-teal-600 hover:text-teal-800 text-lg underline decoration-wavy transition-colors"
+                className="px-6 py-4 text-teal-600 hover:text-teal-800 text-lg underline transition-colors"
               >
                 Skip 🐠
               </button>
@@ -479,8 +488,8 @@ Your response:`;
             </h2>
             <div className="flex justify-center space-x-2">
               <div className="w-3 h-3 bg-teal-400 rounded-full animate-bounce"></div>
-              <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-              <div className="w-3 h-3 bg-emerald-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+              <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce"></div>
+              <div className="w-3 h-3 bg-emerald-400 rounded-full animate-bounce"></div>
             </div>
           </div>
         </div>
@@ -618,29 +627,5 @@ Your response:`;
 
   return null;
 };
-
-// Add custom CSS for animations
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes float {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    33% { transform: translateY(-20px) rotate(5deg); }
-    66% { transform: translateY(-10px) rotate(-5deg); }
-  }
-  
-  @keyframes confetti {
-    0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-  }
-  
-  .animate-float {
-    animation: float 8s ease-in-out infinite;
-  }
-  
-  .animate-confetti {
-    animation: confetti 3s linear forwards;
-  }
-`;
-document.head.appendChild(style);
 
 export default WisdomGenerator;
