@@ -1,6 +1,5 @@
-Found the issue! The Shell icon doesn't exist in Lucide React. Let me fix this by replacing it with an existing icon:
-javascriptimport React, { useState } from 'react';
-import { Heart, Sparkles, User, MapPin, Fish, Waves, Brain, Lightbulb } from 'lucide-react';
+import React, { useState } from 'react';
+import { Heart, Sparkles, User, MapPin, Fish, Brain, Lightbulb } from 'lucide-react';
 
 const WisdomGenerator = () => {
   const [step, setStep] = useState('welcome');
@@ -18,75 +17,11 @@ const WisdomGenerator = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
-  // EmailJS Configuration
   const EMAILJS_CONFIG = {
     SERVICE_ID: 'service_t96az0z',
     TEMPLATE_ID: 'template_bvkjdlq', 
     PUBLIC_KEY: 'TBmm5WjlwKjlTuPRf',
     TO_EMAIL: 'wisdomshare.co@gmail.com'
-  };
-
-  // Floating Icons Component
-  const FloatingIcons = () => {
-    const icons = [
-      { Icon: Fish, delay: 0, duration: 8 },
-      { Icon: Waves, delay: 2, duration: 10 },
-      { Icon: Brain, delay: 4, duration: 12 },
-      { Icon: Lightbulb, delay: 6, duration: 9 },
-      { Icon: Fish, delay: 8, duration: 11 },
-      { Icon: Sparkles, delay: 10, duration: 7 }
-    ];
-
-    return (
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        {icons.map((item, index) => (
-          <div
-            key={index}
-            className="absolute opacity-20"
-            style={{
-              left: `${10 + (index * 15)}%`,
-              top: `${20 + Math.sin(index) * 30}%`,
-              animation: `float ${item.duration}s ease-in-out infinite ${item.delay}s`
-            }}
-          >
-            <item.Icon className="w-8 h-8 text-teal-400" />
-          </div>
-        ))}
-        <style jsx>{`
-          @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            33% { transform: translateY(-20px) rotate(5deg); }
-            66% { transform: translateY(-10px) rotate(-5deg); }
-          }
-        `}</style>
-      </div>
-    );
-  };
-
-  // Confetti Component
-  const Confetti = () => {
-    if (!showConfetti) return null;
-
-    return (
-      <div className="fixed inset-0 pointer-events-none z-50">
-        {[...Array(50)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-teal-400 rounded"
-            style={{
-              left: `${Math.random() * 100}%`,
-              animation: `confetti ${2 + Math.random() * 3}s linear forwards ${Math.random() * 3}s`
-            }}
-          />
-        ))}
-        <style jsx>{`
-          @keyframes confetti {
-            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-          }
-        `}</style>
-      </div>
-    );
   };
 
   const encouragingMessages = [
@@ -107,18 +42,14 @@ const WisdomGenerator = () => {
   const calculateDecades = (age) => {
     const ageNum = parseInt(age);
     const decades = [];
-    
     let currentDecadeStart = Math.floor((ageNum - 1) / 10) * 10;
-    
     while (currentDecadeStart >= 20) {
       decades.push(currentDecadeStart);
       currentDecadeStart -= 10;
     }
-    
     if (ageNum >= 20) {
       decades.push('teens');
     }
-    
     return decades;
   };
 
@@ -140,9 +71,7 @@ const WisdomGenerator = () => {
 
   const handleWisdomSubmit = async () => {
     if (!currentResponse.trim()) return;
-
     const encouragement = await getAIEncouragement(currentResponse);
-    
     const newWisdom = {
       ...responses.wisdom,
       [currentDecade]: {
@@ -150,14 +79,8 @@ const WisdomGenerator = () => {
         encouragement: encouragement
       }
     };
-    
-    setResponses(prev => ({
-      ...prev,
-      wisdom: newWisdom
-    }));
-
+    setResponses(prev => ({ ...prev, wisdom: newWisdom }));
     setStep('encouragement');
-    
     setTimeout(() => {
       moveToNextQuestion(newWisdom);
     }, 2500);
@@ -181,10 +104,8 @@ const WisdomGenerator = () => {
 
   const handleFinalWisdomSubmit = async () => {
     let finalWisdom = responses.wisdom;
-    
     if (currentResponse.trim()) {
       const encouragement = await getAIEncouragement(currentResponse);
-      
       finalWisdom = {
         ...responses.wisdom,
         'additional': {
@@ -192,14 +113,8 @@ const WisdomGenerator = () => {
           encouragement: encouragement
         }
       };
-      
-      setResponses(prev => ({
-        ...prev,
-        wisdom: finalWisdom
-      }));
-
+      setResponses(prev => ({ ...prev, wisdom: finalWisdom }));
       setStep('encouragement');
-      
       setTimeout(() => {
         completeSurvey(finalWisdom);
       }, 2500);
@@ -211,7 +126,6 @@ const WisdomGenerator = () => {
   const sendEmailNotification = async (sessionData) => {
     try {
       const emailjs = (await import('@emailjs/browser')).default;
-
       const wisdomEntries = Object.entries(sessionData.wisdom).map(([decade, data]) => {
         const label = decade === 'additional' ? 'Additional wisdom' : 
                       decade === 'teens' ? 'Wisdom from teenage years' : 
@@ -229,14 +143,7 @@ const WisdomGenerator = () => {
         total_responses: Object.keys(sessionData.wisdom).length
       };
 
-      await emailjs.send(
-        EMAILJS_CONFIG.SERVICE_ID,
-        EMAILJS_CONFIG.TEMPLATE_ID,
-        emailParams,
-        EMAILJS_CONFIG.PUBLIC_KEY
-      );
-
-      console.log('Email sent successfully!');
+      await emailjs.send(EMAILJS_CONFIG.SERVICE_ID, EMAILJS_CONFIG.TEMPLATE_ID, emailParams, EMAILJS_CONFIG.PUBLIC_KEY);
       return true;
     } catch (error) {
       console.error('Email failed:', error);
@@ -246,34 +153,24 @@ const WisdomGenerator = () => {
 
   const completeSurvey = async (finalWisdom) => {
     setIsSubmitting(true);
-
     const completedSession = {
       ...responses,
       wisdom: finalWisdom,
       timestamp: new Date().toISOString(),
       id: Date.now()
     };
-
     await sendEmailNotification(completedSession);
-
     setAllSessions(prev => [...prev, completedSession]);
     setIsSubmitting(false);
-    
     setShowConfetti(true);
     setTimeout(() => setShowConfetti(false), 5000);
-    
     setStep('complete');
   };
 
   const getAIEncouragement = async (userResponse) => {
     try {
       if (typeof window !== 'undefined' && window.claude && window.claude.complete) {
-        const prompt = `The user just shared this wisdom: "${userResponse}"
-
-Respond with a brief, warm, encouraging message (1-2 sentences max) that acknowledges their insight. Be genuine and specific to what they shared.
-
-Your response:`;
-
+        const prompt = `The user just shared this wisdom: "${userResponse}". Respond with a brief, warm, encouraging message (1-2 sentences max).`;
         const aiResponse = await window.claude.complete(prompt);
         return aiResponse.trim();
       }
@@ -296,16 +193,12 @@ Your response:`;
 
   if (step === 'welcome') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-100 via-teal-50 to-cyan-100 relative overflow-hidden">
-        <FloatingIcons />
-        <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-6 max-w-4xl w-full border border-teal-200">
+      <div className="min-h-screen bg-gradient-to-br from-blue-100 via-teal-50 to-cyan-100 p-4">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="bg-white/90 rounded-3xl shadow-2xl p-6 max-w-4xl w-full border border-teal-200">
             <div className="text-center mb-6">
               <div className="flex justify-center mb-4">
-                <div className="relative">
-                  <Brain className="w-20 h-20 text-teal-600 animate-pulse" />
-                  <Sparkles className="w-8 h-8 text-blue-500 absolute -top-2 -right-2 animate-bounce" />
-                </div>
+                <Brain className="w-20 h-20 text-teal-600 animate-pulse" />
               </div>
               <h1 className="text-5xl font-bold bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent mb-4">
                 The Wisdom Generator
@@ -325,7 +218,7 @@ Your response:`;
                 <input
                   type="text"
                   placeholder="What should we call you?"
-                  className="w-full p-4 border-2 border-teal-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 hover:border-teal-300"
+                  className="w-full p-4 border-2 border-teal-200 rounded-xl focus:ring-2 focus:ring-teal-500"
                   value={responses.name}
                   onChange={(e) => setResponses(prev => ({ ...prev, name: e.target.value }))}
                 />
@@ -339,7 +232,7 @@ Your response:`;
                 <input
                   type="text"
                   placeholder="Where are you from?"
-                  className="w-full p-4 border-2 border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-blue-300"
+                  className="w-full p-4 border-2 border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500"
                   value={responses.location}
                   onChange={(e) => setResponses(prev => ({ ...prev, location: e.target.value }))}
                 />
@@ -353,7 +246,7 @@ Your response:`;
                 <input
                   type="number"
                   placeholder="Your age"
-                  className="w-full p-4 border-2 border-cyan-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 hover:border-cyan-300"
+                  className="w-full p-4 border-2 border-cyan-200 rounded-xl focus:ring-2 focus:ring-cyan-500"
                   value={responses.age}
                   onChange={(e) => setResponses(prev => ({ ...prev, age: e.target.value }))}
                   min="15"
@@ -365,7 +258,7 @@ Your response:`;
             <button
               onClick={() => setStep('age-confirm')}
               disabled={!responses.age || parseInt(responses.age) < 18}
-              className="w-full mt-6 bg-gradient-to-r from-teal-500 to-blue-500 text-white py-4 px-8 rounded-xl font-bold text-lg hover:from-teal-600 hover:to-blue-600 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 shadow-lg"
+              className="w-full mt-6 bg-gradient-to-r from-teal-500 to-blue-500 text-white py-4 px-8 rounded-xl font-bold text-lg hover:from-teal-600 hover:to-blue-600 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed shadow-lg"
             >
               🌊 Begin My Wisdom Journey 🌊
             </button>
@@ -384,10 +277,9 @@ Your response:`;
   if (step === 'age-confirm') {
     const calculatedDecades = calculateDecades(responses.age);
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-100 via-teal-50 to-cyan-100 relative overflow-hidden">
-        <FloatingIcons />
-        <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-w-3xl w-full border border-teal-200">
+      <div className="min-h-screen bg-gradient-to-br from-blue-100 via-teal-50 to-cyan-100 p-4">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="bg-white/90 rounded-3xl shadow-2xl p-8 max-w-3xl w-full border border-teal-200">
             <div className="text-center mb-8">
               <Brain className="w-16 h-16 text-teal-600 mx-auto mb-4 animate-pulse" />
               <h2 className="text-4xl font-bold bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent mb-4">
@@ -398,7 +290,7 @@ Your response:`;
               </p>
               
               <div className="bg-gradient-to-r from-teal-50 to-blue-50 p-6 rounded-2xl border border-teal-200">
-                <h3 className="font-bold text-gray-700 mb-4 text-lg">🐠 We'll explore these decades:</h3>
+                <h3 className="font-bold text-gray-700 mb-4 text-lg">We'll explore these decades:</h3>
                 <div className="space-y-3">
                   {calculatedDecades.map((decade, index) => (
                     <div key={decade} className="bg-white/60 p-3 rounded-xl text-teal-700 font-medium border border-teal-100">
@@ -411,7 +303,7 @@ Your response:`;
 
             <button
               onClick={handleAgeSubmit}
-              className="w-full bg-gradient-to-r from-teal-500 to-blue-500 text-white py-4 px-8 rounded-xl font-bold text-lg hover:from-teal-600 hover:to-blue-600 transition-all duration-300 transform hover:scale-105 shadow-lg"
+              className="w-full bg-gradient-to-r from-teal-500 to-blue-500 text-white py-4 px-8 rounded-xl font-bold text-lg hover:from-teal-600 hover:to-blue-600 shadow-lg"
             >
               🌊 Let's Start Sharing Wisdom 🌊
             </button>
@@ -423,18 +315,17 @@ Your response:`;
 
   if (step === 'wisdom') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-100 via-teal-50 to-cyan-100 relative overflow-hidden">
-        <FloatingIcons />
-        <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-w-4xl w-full border border-teal-200">
+      <div className="min-h-screen bg-gradient-to-br from-blue-100 via-teal-50 to-cyan-100 p-4">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="bg-white/90 rounded-3xl shadow-2xl p-8 max-w-4xl w-full border border-teal-200">
             <div className="mb-8">
               <div className="flex justify-between items-center mb-6">
                 <span className="text-sm text-gray-600 bg-teal-50 px-4 py-2 rounded-full border border-teal-200">
-                  🐚 Question {currentDecadeIndex + 1} of {decades.length}
+                  Question {currentDecadeIndex + 1} of {decades.length}
                 </span>
-                <div className="w-48 bg-gray-200 rounded-full h-3 overflow-hidden">
+                <div className="w-48 bg-gray-200 rounded-full h-3">
                   <div 
-                    className="bg-gradient-to-r from-teal-500 to-blue-500 h-3 rounded-full transition-all duration-500"
+                    className="bg-gradient-to-r from-teal-500 to-blue-500 h-3 rounded-full"
                     style={{ width: `${((currentDecadeIndex + 1) / decades.length) * 100}%` }}
                   ></div>
                 </div>
@@ -444,15 +335,15 @@ Your response:`;
                 What do you know now that you wish you knew {getDecadeLabel(currentDecade)}?
               </h2>
               <p className="text-lg text-gray-700">
-                Think about the lessons, insights, or wisdom you've gained since then. 🌊
+                Think about the lessons, insights, or wisdom you've gained since then.
               </p>
             </div>
 
             <textarea
               value={currentResponse}
               onChange={(e) => setCurrentResponse(e.target.value)}
-              placeholder="Share your wisdom here... What would you tell your younger self? 💫"
-              className="w-full p-6 border-2 border-teal-200 rounded-2xl focus:ring-2 focus:ring-teal-500 focus:border-transparent min-h-40 resize-y text-lg transition-all duration-200 hover:border-teal-300"
+              placeholder="Share your wisdom here... What would you tell your younger self?"
+              className="w-full p-6 border-2 border-teal-200 rounded-2xl focus:ring-2 focus:ring-teal-500 min-h-40 text-lg"
               rows={8}
             />
 
@@ -460,15 +351,15 @@ Your response:`;
               <button
                 onClick={handleWisdomSubmit}
                 disabled={!currentResponse.trim()}
-                className="flex-1 bg-gradient-to-r from-teal-500 to-blue-500 text-white py-4 px-8 rounded-xl font-bold text-lg hover:from-teal-600 hover:to-blue-600 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 shadow-lg"
+                className="flex-1 bg-gradient-to-r from-teal-500 to-blue-500 text-white py-4 px-8 rounded-xl font-bold text-lg hover:from-teal-600 hover:to-blue-600 disabled:from-gray-300 disabled:cursor-not-allowed shadow-lg"
               >
                 🌊 Share This Wisdom
               </button>
               <button
                 onClick={handleSkip}
-                className="px-6 py-4 text-teal-600 hover:text-teal-800 text-lg underline transition-colors"
+                className="px-6 py-4 text-teal-600 hover:text-teal-800 text-lg underline"
               >
-                Skip 🐠
+                Skip
               </button>
             </div>
           </div>
@@ -480,10 +371,9 @@ Your response:`;
   if (step === 'encouragement') {
     const currentWisdomData = responses.wisdom[currentDecade] || responses.wisdom['additional'];
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-100 via-teal-50 to-blue-100 relative overflow-hidden">
-        <FloatingIcons />
-        <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-w-2xl w-full text-center border border-emerald-200">
+      <div className="min-h-screen bg-gradient-to-br from-emerald-100 via-teal-50 to-blue-100 p-4">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="bg-white/90 rounded-3xl shadow-2xl p-8 max-w-2xl w-full text-center border border-emerald-200">
             <Heart className="w-20 h-20 text-emerald-500 mx-auto mb-6 animate-pulse" />
             <h2 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-4">
               {currentWisdomData?.encouragement || getRandomEncouragement()}
@@ -501,16 +391,15 @@ Your response:`;
 
   if (step === 'final-wisdom') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-100 via-teal-50 to-cyan-100 relative overflow-hidden">
-        <FloatingIcons />
-        <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-w-4xl w-full border border-teal-200">
+      <div className="min-h-screen bg-gradient-to-br from-blue-100 via-teal-50 to-cyan-100 p-4">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="bg-white/90 rounded-3xl shadow-2xl p-8 max-w-4xl w-full border border-teal-200">
             <div className="mb-8">
               <div className="flex justify-between items-center mb-6">
                 <span className="text-sm text-gray-600 bg-blue-50 px-4 py-2 rounded-full border border-blue-200">
-                  🌊 Final Question
+                  Final Question
                 </span>
-                <div className="w-48 bg-gray-200 rounded-full h-3 overflow-hidden">
+                <div className="w-48 bg-gray-200 rounded-full h-3">
                   <div className="bg-gradient-to-r from-teal-500 to-blue-500 h-3 rounded-full w-full"></div>
                 </div>
               </div>
@@ -519,15 +408,15 @@ Your response:`;
                 Is there any additional wisdom you'd like to share?
               </h2>
               <p className="text-lg text-gray-700">
-                Any other life lessons, insights, or advice that comes to mind? This is completely optional. ✨
+                Any other life lessons, insights, or advice that comes to mind? This is completely optional.
               </p>
             </div>
 
             <textarea
               value={currentResponse}
               onChange={(e) => setCurrentResponse(e.target.value)}
-              placeholder="Share any additional wisdom, life lessons, or insights... (optional) 🌟"
-              className="w-full p-6 border-2 border-teal-200 rounded-2xl focus:ring-2 focus:ring-teal-500 focus:border-transparent min-h-40 resize-y text-lg transition-all duration-200 hover:border-teal-300"
+              placeholder="Share any additional wisdom, life lessons, or insights... (optional)"
+              className="w-full p-6 border-2 border-teal-200 rounded-2xl focus:ring-2 focus:ring-teal-500 min-h-40 text-lg"
               rows={8}
             />
 
@@ -535,7 +424,7 @@ Your response:`;
               <button
                 onClick={handleFinalWisdomSubmit}
                 disabled={isSubmitting}
-                className="flex-1 bg-gradient-to-r from-teal-500 to-blue-500 text-white py-4 px-8 rounded-xl font-bold text-lg hover:from-teal-600 hover:to-blue-600 disabled:from-gray-300 disabled:to-gray-400 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                className="flex-1 bg-gradient-to-r from-teal-500 to-blue-500 text-white py-4 px-8 rounded-xl font-bold text-lg hover:from-teal-600 hover:to-blue-600 disabled:from-gray-300 shadow-lg"
               >
                 {isSubmitting ? '🌊 Submitting...' : currentResponse.trim() ? '🌊 Share Final Wisdom' : '🌊 Complete Journey'}
               </button>
@@ -548,22 +437,32 @@ Your response:`;
 
   if (step === 'complete') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-100 via-teal-50 to-cyan-100 relative overflow-hidden">
-        <FloatingIcons />
-        <Confetti />
-        <div className="relative z-10 min-h-screen p-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-100 via-teal-50 to-cyan-100 p-4">
+        {showConfetti && (
+          <div className="fixed inset-0 pointer-events-none z-50">
+            {[...Array(50)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-teal-400 rounded animate-bounce"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  animationDelay: `${Math.random() * 2}s`
+                }}
+              />
+            ))}
+          </div>
+        )}
+        <div className="min-h-screen">
           <div className="max-w-6xl mx-auto">
-            <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 mb-8 border border-teal-200">
+            <div className="bg-white/90 rounded-3xl shadow-2xl p-8 mb-8 border border-teal-200">
               <div className="text-center mb-8">
-                <div className="relative mb-6">
-                  <Brain className="w-24 h-24 text-teal-600 mx-auto animate-pulse" />
-                  <Sparkles className="w-12 h-12 text-blue-500 absolute -top-2 -right-2 animate-bounce" />
-                </div>
+                <Brain className="w-24 h-24 text-teal-600 mx-auto mb-4 animate-pulse" />
                 <h2 className="text-5xl font-bold bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent mb-4">
                   Your Wisdom Journey
                 </h2>
                 <p className="text-xl text-gray-700">
-                  Thank you for sharing your life's wisdom. Here's your complete reflection: 🌊
+                  Thank you for sharing your life's wisdom. Here's your complete reflection:
                 </p>
               </div>
 
@@ -571,7 +470,7 @@ Your response:`;
                 {Object.entries(responses.wisdom).map(([decade, data]) => (
                   <div key={decade} className="bg-gradient-to-r from-teal-50 to-blue-50 p-6 rounded-2xl border-l-4 border-teal-400 shadow-md">
                     <h3 className="font-bold text-teal-700 text-xl mb-3">
-                      🐚 {decade === 'additional' ? 'Additional wisdom:' : `Wisdom from ${getDecadeLabel(decade)}:`}
+                      {decade === 'additional' ? 'Additional wisdom:' : `Wisdom from ${getDecadeLabel(decade)}:`}
                     </h3>
                     <p className="text-gray-700 leading-relaxed text-lg italic">
                       "{data.response}"
@@ -581,7 +480,7 @@ Your response:`;
               </div>
 
               <div className="mt-8 p-6 bg-gradient-to-r from-blue-100 to-teal-100 rounded-2xl border border-blue-200">
-                <h3 className="font-bold text-gray-700 mb-3 text-xl">🌊 Session Summary</h3>
+                <h3 className="font-bold text-gray-700 mb-3 text-xl">Session Summary</h3>
                 <div className="grid md:grid-cols-2 gap-4 text-gray-600">
                   <p><strong>Age:</strong> {responses.age}</p>
                   {responses.name && <p><strong>Name:</strong> {responses.name}</p>}
@@ -595,32 +494,12 @@ Your response:`;
               <div className="flex gap-4 mt-8">
                 <button
                   onClick={resetSurvey}
-                  className="flex-1 bg-gradient-to-r from-teal-500 to-blue-500 text-white py-4 px-8 rounded-xl font-bold text-lg hover:from-teal-600 hover:to-blue-600 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                  className="flex-1 bg-gradient-to-r from-teal-500 to-blue-500 text-white py-4 px-8 rounded-xl font-bold text-lg hover:from-teal-600 hover:to-blue-600 shadow-lg"
                 >
                   🌊 Share Another Person's Wisdom 🌊
                 </button>
               </div>
             </div>
-
-            {allSessions.length > 0 && (
-              <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-teal-200">
-                <h3 className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent mb-6">
-                  🐠 Previous Wisdom Shared
-                </h3>
-                <div className="grid gap-4">
-                  {allSessions.slice(-3).map((session) => (
-                    <div key={session.id} className="bg-gradient-to-r from-teal-50 to-blue-50 p-4 rounded-xl border-l-4 border-teal-300">
-                      <p className="text-sm text-gray-600 mb-2">
-                        {session.name ? `🌊 ${session.name} • ` : ''}Age {session.age} • {new Date(session.timestamp).toLocaleDateString()}
-                      </p>
-                      <p className="text-gray-700 italic">
-                        "{Object.values(session.wisdom)[0]?.response.substring(0, 100)}..."
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
