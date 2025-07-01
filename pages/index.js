@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Heart, Sparkles, User, MapPin, Fish, Shell, Brain, Lightbulb } from 'lucide-react';
+Found the issue! The Shell icon doesn't exist in Lucide React. Let me fix this by replacing it with an existing icon:
+javascriptimport React, { useState } from 'react';
+import { Heart, Sparkles, User, MapPin, Fish, Waves, Brain, Lightbulb } from 'lucide-react';
 
 const WisdomGenerator = () => {
   const [step, setStep] = useState('welcome');
@@ -29,11 +30,11 @@ const WisdomGenerator = () => {
   const FloatingIcons = () => {
     const icons = [
       { Icon: Fish, delay: 0, duration: 8 },
-      { Icon: Shell, delay: 2, duration: 10 },
+      { Icon: Waves, delay: 2, duration: 10 },
       { Icon: Brain, delay: 4, duration: 12 },
       { Icon: Lightbulb, delay: 6, duration: 9 },
       { Icon: Fish, delay: 8, duration: 11 },
-      { Icon: Shell, delay: 10, duration: 7 }
+      { Icon: Sparkles, delay: 10, duration: 7 }
     ];
 
     return (
@@ -44,6 +45,7 @@ const WisdomGenerator = () => {
             className="absolute opacity-20"
             style={{
               left: `${10 + (index * 15)}%`,
+              top: `${20 + Math.sin(index) * 30}%`,
               animation: `float ${item.duration}s ease-in-out infinite ${item.delay}s`
             }}
           >
